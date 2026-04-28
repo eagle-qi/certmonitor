@@ -90,8 +90,8 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	logger.Info("CertMonitor 服务启动成功, 监听端口: %d", cfg.App.Port)
-	logger.Info("API文档地址: http://localhost:%d/api/v1/docs", cfg.App.Port)
+	logger.Info(fmt.Sprintf("CertMonitor 服务启动成功, 监听端口: %d", cfg.App.Port))
+	logger.Info(fmt.Sprintf("API文档地址: http://localhost:%d/api/v1/docs", cfg.App.Port))
 
 	// 优雅关闭
 	go func() {

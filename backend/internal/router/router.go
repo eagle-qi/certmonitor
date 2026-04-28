@@ -17,6 +17,11 @@ func Setup(r *gin.Engine, db *gorm.DB, rdb *redis.Client, cfg *config.Config) *g
 	// ==================== 公开接口（无需登录）====================
 	public := api.Group("")
 	{
+		// 健康检查
+		public.GET("/health", func(c *gin.Context) {
+			c.JSON(200, gin.H{"status": "ok", "service": "certmonitor-backend"})
+		})
+
 		// 用户认证
 		auth := public.Group("/auth")
 		authHandler := handler.NewAuthHandler(db, rdb, cfg)
