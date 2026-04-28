@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"certmonitor/internal/config"
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
+	"certmonitor/pkg/logger"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -84,7 +86,11 @@ func (h *DetectHandler) ListCompanyTasks(c *gin.Context) {
 	query.Count(&total)
 
 	var tasks []model.DetectRecordCompany
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	query.Offset(offset).Limit(pageSize.(int)).Order("create_time DESC").Find(&tasks)
 
 	response.PageSuccess(c, tasks, total, page.(int), pageSize.(int))
@@ -215,7 +221,11 @@ func (h *DetectHandler) ListIntranetTasks(c *gin.Context) {
 	query.Count(&total)
 
 	var tasks []model.DetectRecordIntranet
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	query.Offset(offset).Limit(pageSize.(int)).Order("create_time DESC").Find(&tasks)
 
 	response.PageSuccess(c, tasks, total, page.(int), pageSize.(int))
@@ -245,7 +255,11 @@ func (h *DetectHandler) IntranetTaskDetails(c *gin.Context) {
 	var total int64
 
 	h.db.Model(&model.DetectIntranetDetail{}).Where("task_id = ?", taskID).Count(&total)
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	h.db.Where("task_id = ?", taskID).
 		Offset(offset).Limit(pageSize.(int)).
 		Order("ip_address ASC, port ASC").

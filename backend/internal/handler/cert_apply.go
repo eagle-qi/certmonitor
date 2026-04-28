@@ -96,7 +96,11 @@ func (h *CertApplyHandler) ListTasks(c *gin.Context) {
 	query.Count(&total)
 
 	var tasks []model.SslCertApplyTask
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	query.Offset(offset).Limit(pageSize.(int)).Order("create_time DESC").Find(&tasks)
 
 	response.PageSuccess(c, tasks, total, page.(int), pageSize.(int))
@@ -167,9 +171,10 @@ func (h *CertApplyHandler) executeCertSign(task *model.SslCertApplyTask) {
 		"key_size":           task.KeySize,
 		"valid_days":         task.ValidDays,
 	}
+	_ = payload
 
 	// TODO: 调用 Python 签发引擎接口
-	apiBaseURL := h.config.Crawler.APIBaseURL()
+	_ = h.config.Crawler.APIBaseURL()
 
 	if task.ApplyType == 1 {
 		// 公网域名 -> 调用 ACME 协议签发（Let's Encrypt等）

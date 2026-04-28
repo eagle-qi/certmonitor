@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -60,7 +64,11 @@ func (h *CertHandler) List(c *gin.Context) {
 	query.Count(&total)
 
 	var certs []model.SslCertInfo
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	query.Offset(offset).Limit(pageSize.(int)).Order(order).Find(&certs)
 
 	response.PageSuccess(c, certs, total, page.(int), pageSize.(int))
