@@ -103,7 +103,7 @@ services:
       CRAWLER_API_HOST: certmonitor-crawler
       CRAWLER_API_PORT: 8000
 
-      FRONTEND_URL: http://localhost:${NGINX_PORT:-80}
+      FRONTEND_URL: http://localhost:${NGINX_PORT:-8880}
     ports:
       - "${GO_PORT:-8080}:8080"
     volumes:
@@ -155,7 +155,7 @@ services:
     depends_on:
       - certmonitor-go
     ports:
-      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_PORT:-8880}:80"
       - "${NGINX_SSL_PORT:-443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
