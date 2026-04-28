@@ -8,6 +8,7 @@ import (
 	"certmonitor/internal/config"
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
+	"certmonitor/pkg/logger"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -136,7 +137,7 @@ func (h *CertApplyHandler) Retry(c *gin.Context) {
 
 // DownloadCertPackage 下载签发成功的证书包
 func (h *CertApplyHandler) DownloadCertPackage(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	var task model.SslCertApplyTask
 	if h.db.First(&task, id).Error != nil || task.CertFilePath == "" {

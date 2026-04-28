@@ -65,7 +65,7 @@ func (h *LogHandler) List(c *gin.Context) {
 
 // Detail 日志详情
 func (h *LogHandler) Detail(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	var log model.SysOperationLog
 	if h.db.First(&log, id).Error != nil {

@@ -64,7 +64,7 @@ func (h *AlertHandler) Update(c *gin.Context) {
 
 // Delete 删除规则
 func (h *AlertHandler) Delete(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	result := h.db.Delete(&model.AlertRule{}, id)
 	if result.RowsAffected == 0 {
 		response.NotFound(c, "规则不存在", nil)
@@ -76,7 +76,7 @@ func (h *AlertHandler) Delete(c *gin.Context) {
 
 // ToggleEnable 启用/禁用规则
 func (h *AlertHandler) ToggleEnable(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	var req struct {
 		Enabled uint8 `json:"enabled" binding:"required,oneof=0 1"`

@@ -5,6 +5,8 @@ import (
 	"encoding/pem"
 	"fmt"
 	"net/http"
+	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +16,7 @@ import (
 	"certmonitor/internal/model"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -310,7 +313,7 @@ func (h *CertHandler) RiskStats(c *gin.Context) {
 
 // DownloadCert 下载证书文件
 func (h *CertHandler) DownloadCert(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	var applyTask model.SslCertApplyTask
 	if h.db.First(&applyTask, id).Error != nil || applyTask.CertFilePath == "" {

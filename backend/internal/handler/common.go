@@ -34,7 +34,7 @@ func recordOperationLog(db *gorm.DB, userID uint64, module, opType string, c *gi
 		CreateTime:      time.Now(),
 	}
 
-	if err := db.Create(&logEntry).Error != nil {
+	if err := db.Create(&logEntry).Error; err != nil {
 		logger.Warn("写入审计日志失败: %v", err)
 	}
 }
