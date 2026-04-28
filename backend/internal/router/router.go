@@ -1,11 +1,12 @@
 package router
 
 import (
+	"certmonitor/internal/config"
 	"certmonitor/internal/handler"
 	"certmonitor/internal/middleware"
-	"certmonitor/pkg/redis"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
