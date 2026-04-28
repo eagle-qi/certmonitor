@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -123,7 +124,7 @@ func (h *StatisticsHandler) AssetDistribution(c *gin.Context) {
 // DetectOverview 探测任务统计
 func (h *StatisticsHandler) DetectOverview(c *gin.Context) {
 	var companyTotal, companySuccess, companyFail int64
-	var intranetTotal, intranetSuccess intranetPartial int64
+	var intranetTotal, intranetSuccess, intranetPartial int64
 
 	h.db.Model(&model.DetectRecordCompany{}).Count(&companyTotal)
 	h.db.Model(&model.DetectRecordCompany{}).Where("task_status = 3").Count(&companySuccess)

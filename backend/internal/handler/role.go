@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 
+	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -51,7 +53,7 @@ func (h *RoleHandler) List(c *gin.Context) {
 
 // Update 更新角色
 func (h *RoleHandler) Update(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	var existing model.SysRole
 	if h.db.First(&existing, id).Error != nil {
@@ -74,7 +76,7 @@ func (h *RoleHandler) Update(c *gin.Context) {
 
 // Delete 删除角色
 func (h *RoleHandler) Delete(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	// 检查是否有用户使用该角色
 	var userCount int64
