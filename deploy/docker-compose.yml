@@ -147,26 +147,27 @@ services:
     networks:
       - certmonitor-net
 
-  # ==================== Nginx 前端 + API网关 ====================
-  nginx:
-    image: nginx:alpine
-    container_name: certmonitor-nginx
-    restart: unless-stopped
-    depends_on:
-      - certmonitor-go
-    ports:
-      - "${NGINX_PORT:-8880}:80"
-      - "${NGINX_SSL_PORT:-38443}:443"
-    volumes:
-      - ./docker/docker-entrypoint-nginx.sh:/docker-entrypoint-custom.sh:ro
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ../frontend/dist:/usr/share/nginx/html:ro
-      - ssl_certs:/etc/nginx/ssl
-      - nginx_logs:/var/log/nginx
-    entrypoint: ["/bin/sh", "/docker-entrypoint-custom.sh"]
-    networks:
-      - certmonitor-net
+  # ==================== Nginx 前端 + API网关 (已禁用) ====================
+  # 如需启用，取消注释以下配置并确保 SSL 证书就绪
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: certmonitor-nginx
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - certmonitor-go
+  #   ports:
+  #     - "${NGINX_PORT:-8880}:80"
+  #     - "${NGINX_SSL_PORT:-38443}:443"
+  #   volumes:
+  #     - ./docker/docker-entrypoint-nginx.sh:/docker-entrypoint-custom.sh:ro
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/conf.d:/etc/nginx/conf.d:ro
+  #     - ../frontend/dist:/usr/share/nginx/html:ro
+  #     - ssl_certs:/etc/nginx/ssl
+  #     - nginx_logs:/var/log/nginx
+  #   entrypoint: ["/bin/sh", "/docker-entrypoint-custom.sh"]
+  #   networks:
+  #     - certmonitor-net
 
 volumes:
   mysql_data:
@@ -178,10 +179,6 @@ volumes:
   logs_data:
     driver: local
   cert_output_data:
-    driver: local
-  ssl_certs:
-    driver: local
-  nginx_logs:
     driver: local
 
 networks:
