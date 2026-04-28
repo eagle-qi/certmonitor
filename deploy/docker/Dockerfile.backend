@@ -12,6 +12,9 @@ RUN go mod download
 # 复制源代码
 COPY . .
 
+# 安装新增依赖（确保 go.mod/go.sum 与源代码同步）
+RUN go mod tidy
+
 # 编译二进制（静态链接，减小体积）
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -ldflags="-w -s" \
