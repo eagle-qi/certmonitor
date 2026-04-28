@@ -1,14 +1,19 @@
 package handler
 
 import (
+	"fmt"
+	"net/http"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 
 	"certmonitor/internal/config"
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
 	"certmonitor/pkg/response"
-	"certmonitor/pkg/redis"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -96,7 +101,11 @@ func (h *AssetHandler) List(c *gin.Context) {
 	query.Count(&total)
 
 	var assets []model.WebAsset
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	order := "create_time DESC"
 	query.Preload("Certificates").Offset(offset).Limit(pageSize.(int)).Order(order).Find(&assets)
 

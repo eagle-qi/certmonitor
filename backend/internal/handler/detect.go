@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/redis/go-redis/v9"
+
 	"certmonitor/internal/config"
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
