@@ -15,9 +15,12 @@ import (
 	"certmonitor/internal/model"
 	"certmonitor/internal/router"
 	"certmonitor/pkg/logger"
-	"certmonitor/pkg/redis"
+	certRedis "certmonitor/pkg/redis"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
+	"github.com/robfig/cron/v3"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -28,10 +31,18 @@ func main() {
 	}
 
 	// 2. 初始化日志
-	logger.Init(cfg.Log)
+	logger.Init(logger.Config{
+		Level:      cfg.Log.Level,
+		Format:     cfg.Log.Format,
+		Path:       cfg.Log.Path,
+		MaxSize:    cfg.Log.MaxSize,
+		MaxBackups: cfg.Log.MaxBackups,
+		MaxAge:     cfg.Log.MaxAge,
+		Compress:   cfg.Log.Compress,
+	})
 
 	// 3. 初始化 Redis
-	redisClient, redisErr := redis.NewClient(cfg.Redis)
+	redisClient, redisErr := certRedis.NewClient(cfg.Redis)
 	if redisErr != nil {
 		logger.Fatal("Redis 连接失败: %v", redisErr)
 	}
