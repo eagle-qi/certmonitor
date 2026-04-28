@@ -31,6 +31,7 @@ WORKDIR /app
 
 # 从 builder 阶段复制编译产物
 COPY --from=builder /certmonitor-server .
+COPY --from=builder /app/config.yaml .
 
 # 创建必要目录
 RUN mkdir -p /app/uploads/import /app/uploads/certs /app/logs
