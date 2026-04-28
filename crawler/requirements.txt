@@ -1,0 +1,46 @@
+# CertMonitor Python探测引擎依赖
+# 用于公网备案资产探测、内网URL扫描、SSL证书采集、证书签发
+
+# HTTP请求
+requests>=2.31.0
+aiohttp>=3.9.0
+httpx>=0.25.0
+
+# SSL/TLS 证书相关
+cryptography>=41.0.0
+pyOpenSSL>=23.3.0
+
+# Web框架 (FastAPI提供API接口供Go后端调用)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# 任务调度
+APScheduler>=3.10.4
+
+# 网络扫描
+python-nmap>=0.7.1
+socket>=1.0.0
+
+# 数据处理
+pandas>=2.1.0
+openpyxl>=3.1.2
+xlsxwriter>=3.1.9
+
+# ACME协议(用于Let's Encrypt等免费证书申请)
+certbot-acme>=2.8.0
+acme>=2.8.0
+
+# 工具库
+python-dotenv>=1.0.0
+loguru>=0.7.2
+tenacity>=8.2.0
+
+# IP地址处理
+ipaddress>=1.0.0
+netaddr>=0.10.1
+
+# HTML解析(获取网页标题等)
+beautifulsoup4>=4.12.0
+lxml>=4.13.0

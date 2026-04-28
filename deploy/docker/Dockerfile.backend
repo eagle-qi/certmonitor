@@ -1,0 +1,37 @@
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+
+# 先复制依赖定义文件，利用Docker缓存加速构建
+COPY go.mod go.sum ./
+RUN go mod download || true  # 首次运行可能没有 go.sum，忽略错误
+
+# 复制源代码
+COPY . .
+
+# 编译二进制（静态链接，减小体积）
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-w -s -X main.version=$(git describe --tags 2>/dev/null || echo v1.0.0)" \
+    -o /certmonitor-server ./cmd/main.go
+
+# 运行阶段：使用更小的 alpine 镜像
+FROM alpine:3.19
+
+RUN apk add --no-cache ca-certificates tzdata && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone
+
+WORKDIR /app
+
+# 从 builder 阶段复制编译产物
+COPY --from=builder /certmonitor-server .
+
+# 创建必要目录
+RUN mkdir -p /app/uploads/import /app/uploads/certs /app/logs
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/v1/health || exit 1
+
+ENTRYPOINT ["./certmonitor-server"]
