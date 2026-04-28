@@ -57,7 +57,11 @@ func (h *LogHandler) List(c *gin.Context) {
 	query.Count(&total)
 
 	var logs []model.SysOperationLog
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	query.Order("create_time DESC").Offset(offset).Limit(pageSize.(int)).Find(&logs)
 
 	response.PageSuccess(c, logs, total, page.(int), pageSize.(int))

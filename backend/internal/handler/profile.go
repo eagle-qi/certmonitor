@@ -101,7 +101,11 @@ func (h *ProfileHandler) MyOperationLogs(c *gin.Context) {
 	h.db.Model(&model.SysOperationLog{}).Where("user_id = ?", userID).Count(&total)
 
 	var logs []model.SysOperationLog
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	h.db.Where("user_id = ?", userID).
 		Order("create_time DESC").
 		Offset(offset).Limit(pageSize.(int)).Find(&logs)

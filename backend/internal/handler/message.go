@@ -2,6 +2,7 @@ package handler
 
 import (
 	"strconv"
+	"time"
 
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
@@ -39,7 +40,11 @@ func (h *MessageHandler) List(c *gin.Context) {
 	query.Count(&total)
 
 	var messages []model.NotifyMessage
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	query.Order("create_time DESC").Offset(offset).Limit(pageSize.(int)).Find(&messages)
 
 	response.PageSuccess(c, messages, total, page.(int), pageSize.(int))

@@ -6,6 +6,7 @@ import (
 
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
+	"certmonitor/pkg/logger"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -62,7 +63,11 @@ func (h *UserHandler) List(c *gin.Context) {
 
 	// 分页查询
 	var users []model.SysUser
-	offset, _ := c.Get("offset")
+	offsetVal, _ := c.Get("offset")
+	offset := 0
+	if ov, ok := offsetVal.(int); ok {
+		offset = ov
+	}
 	order := "create_time DESC"
 	query.Preload("Roles").Offset(offset).Limit(pageSize.(int)).Order(order).Find(&users)
 
@@ -112,7 +117,6 @@ func (h *UserHandler) Create(c *gin.Context) {
 		AccountStatus: model.AccountStatusNormal,
 		RegisterType:  model.RegisterTypeManual,
 		Remark:        req.Remark,
-		CreatorID:     &currentUserID,
 	}
 
 	tx := h.db.Begin()

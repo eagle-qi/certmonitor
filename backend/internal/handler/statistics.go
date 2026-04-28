@@ -27,7 +27,8 @@ func (h *StatisticsHandler) AssetOverview(c *gin.Context) {
 	h.db.Model(&model.WebAsset{}).Count(&total)
 	h.db.Model(&model.WebAsset{}).Where("asset_status = ?", model.AssetStatusConfirmed).Count(&confirmed)
 	h.db.Model(&model.WebAsset{}).Where("asset_status = ?", model.AssetStatusPending).Count(&pending)
-	h.db.Model(&model.WebAsset{}).Where("asset_status >= ?", model.AssetStatusInvalid).Count(&invalid + deprecated)
+	h.db.Model(&model.WebAsset{}).Where("asset_status = ?", model.AssetStatusInvalid).Count(&invalid)
+	h.db.Model(&model.WebAsset{}).Where("asset_status = ?", model.AssetStatusDeprecated).Count(&deprecated)
 
 	// 协议分布
 	var httpCount, httpsCount int64
