@@ -72,7 +72,7 @@ services:
   certmonitor-go:
     build:
       context: ../backend
-      dockerfile: ./docker/Dockerfile.backend
+      dockerfile: ../deploy/docker/Dockerfile.backend
     container_name: certmonitor-backend
     restart: unless-stopped
     depends_on:
@@ -115,7 +115,7 @@ services:
   certmonitor-crawler:
     build:
       context: ../crawler
-      dockerfile: ./docker/Dockerfile.crawler
+      dockerfile: ../deploy/docker/Dockerfile.crawler
     container_name: certmonitor-crawler
     restart: unless-stopped
     depends_on:
