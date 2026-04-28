@@ -2,7 +2,6 @@ package handler
 
 import (
 	"strconv"
-	"time"
 
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"

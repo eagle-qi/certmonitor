@@ -8,7 +8,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"net"
-	"net/http"
 	"net/url"
 	"path/filepath"
 	"strconv"

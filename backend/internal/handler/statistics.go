@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 
 	"certmonitor/internal/middleware"

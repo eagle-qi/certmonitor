@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"strconv"
 
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
