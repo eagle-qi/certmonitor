@@ -2,8 +2,11 @@ FROM golang:1.21 AS builder
 
 WORKDIR /app
 
+# 使用国内 Go 代理加速依赖下载
+ENV GOPROXY=https://goproxy.cn,direct
+
 # 先复制依赖定义文件，利用Docker缓存加速构建
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 # 复制源代码
