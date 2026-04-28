@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -12,6 +17,7 @@ import (
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
 	certRedis "certmonitor/pkg/redis"
+	"certmonitor/pkg/logger"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -77,20 +83,20 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	// 检查 Redis 中是否被锁定
-	locked, _ := redis.IsAccountLocked(ctx, req.Username)
+	locked, _ := certRedis.IsAccountLocked(ctx, req.Username)
 	if locked {
-		response.Forbidden(c, fmt.Sprintf("连续登录失败次数过多，账号已锁定 %d 分钟，请稍后重试", redis.LockDuration/time.Minute), nil)
+		response.Forbidden(c, fmt.Sprintf("连续登录失败次数过多，账号已锁定 %d 分钟，请稍后重试", certRedis.LockDuration/time.Minute), nil)
 		return
 	}
 
 	// 验证密码
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		// 记录登录失败
-		count, _ := redis.RecordLoginFailure(ctx, req.Username)
+		count, _ := certRedis.RecordLoginFailure(ctx, req.Username)
 
-		if count >= redis.LoginMaxAttempts-1 {
+		if count >= certRedis.LoginMaxAttempts-1 {
 			// 更新数据库中的锁状态
-			lockUntil := time.Now().Add(redis.LockDuration)
+			lockUntil := time.Now().Add(certRedis.LockDuration)
 			h.db.Model(&user).Updates(map[string]interface{}{
 				"login_fail_count": count,
 				"lock_until":       lockUntil,
@@ -98,13 +104,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 			response.Forbidden(c, "连续登录失败次数过多，账号已锁定", nil)
 		} else {
 			h.db.Model(&user).Update("login_fail_count", count)
-			response.Unauthorized(c, fmt.Sprintf("用户名或密码错误(剩余%d次尝试机会)", redis.LoginMaxAttempts-count), nil)
+			response.Unauthorized(c, fmt.Sprintf("用户名或密码错误(剩余%d次尝试机会)", certRedis.LoginMaxAttempts-count), nil)
 		}
 		return
 	}
 
 	// 登录成功：清除失败记录
-	redis.ClearLoginFailures(ctx, req.Username)
+	certRedis.ClearLoginFailures(ctx, req.Username)
 	h.db.Model(&user).Updates(map[string]interface{}{
 		"last_login_ip":    ip,
 		"last_login_time": time.Now(),
@@ -134,7 +140,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	// 缓存用户会话信息到 Redis
-	redis.SaveUserSession(ctx, user.ID, map[string]interface{}{
+	certRedis.SaveUserSession(ctx, user.ID, map[string]interface{}{
 		"user_id":  user.ID,
 		"username": user.Username,
 		"email":    user.Email,
@@ -209,7 +215,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	// 4. 验证邮箱验证码
-	valid, err := redis.VerifyCaptcha(ctx, req.Email, req.Captcha, "register")
+	valid, err := certRedis.VerifyCaptcha(ctx, req.Email, req.Captcha, "register")
 	if err != nil || !valid {
 		response.BadRequest(c, "验证码无效或已过期", nil)
 		return
@@ -290,7 +296,7 @@ func (h *AuthHandler) SendCaptcha(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	// 1. 检查发送频率限制
-	canSend, err := redis.CheckCaptchaRateLimit(ctx, req.Email)
+	canSend, err := certRedis.CheckCaptchaRateLimit(ctx, req.Email)
 	if err != nil {
 		logger.Error("检查频率限制失败: %v", err)
 		response.InternalError(c, "服务异常，请稍后重试", nil)
@@ -315,7 +321,7 @@ func (h *AuthHandler) SendCaptcha(c *gin.Context) {
 	captcha := generateRandomNumber(6)
 
 	// 4. 保存验证码到 Redis
-	if err := redis.SaveCaptcha(ctx, req.Email, captcha, req.CaptchaType); err != nil {
+	if err := certRedis.SaveCaptcha(ctx, req.Email, captcha, req.CaptchaType); err != nil {
 		logger.Error("保存验证码失败: %v", err)
 		response.InternalError(c, "服务异常，请稍后重试", nil)
 		return
@@ -344,7 +350,7 @@ func (h *AuthHandler) SSOLogin(c *gin.Context) {
 	)
 
 	// 将 state 存入 Redis 用于回调时校验
-	redis.Set(c.Request.Context(), "certmonitor:sso:state:"+state, "", 10*time.Minute)
+	certRedis.Set(c.Request.Context(), "certmonitor:sso:state:"+state, "", 10*time.Minute)
 
 	c.JSON(http.StatusOK, response.Response{
 		Code:    200,

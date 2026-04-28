@@ -3,6 +3,8 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -13,6 +15,7 @@ import (
 	"certmonitor/internal/config"
 	"certmonitor/internal/middleware"
 	"certmonitor/internal/model"
+	"certmonitor/pkg/logger"
 	"certmonitor/pkg/response"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -357,6 +360,7 @@ func (h *AssetHandler) processImportFile(taskID uint64, filePath, fileName strin
 	successCount := 0
 	failCount := 0
 
+	var task model.WebAssetImportTask
 	h.db.Model(&task).Where("id = ?", taskID).Updates(map[string]interface{}{
 		"task_status":   2,
 		"success_count": successCount,
