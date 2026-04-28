@@ -6,6 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetRequestID 从上下文获取请求ID
+func GetRequestID(c *gin.Context) string {
+	if c == nil {
+		return ""
+	}
+	requestID, exists := c.Get("request_id")
+	if !exists {
+		return ""
+	}
+	if id, ok := requestID.(string); ok {
+		return id
+	}
+	return ""
+}
+
 // Response 统一响应结构体
 type Response struct {
 	Code      int         `json:"code"`
